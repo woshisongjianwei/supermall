@@ -26,8 +26,9 @@ xhr.interceptors.request.use(
     loadingInstance = Vue.prototype.$loading.service({})
 
     // 添加token
-    let userInfo = JSON.parse(sessionStorage.getItem('userInfo'))
+    const userInfo = JSON.parse(sessionStorage.getItem('userInfo'))
     if (userInfo) {
+      // eslint-disable-next-line dot-notation
       config.headers.common['userInfo'] = userInfo
     }
 
@@ -69,7 +70,7 @@ xhr.interceptors.response.use(
 
     // 决定因素有两重，一重是最外层的 response.status，这一重是 axios 的源码封装的
     // 另一重是 response.data.code，这一重是咱们本项目自己的逻辑
-    let { status, data } = response
+    const { status, data } = response
     // const statusCode = response.status
     if (status === STATUS_OK) { // response.status 为 200
       // 第一重是200但是第二重不是200，表示持续时间过期了以及别的特殊情况，
@@ -111,7 +112,7 @@ xhr.interceptors.response.use(
         msg: '网络异常，请稍后再试' // 唯一的可能就是，断网了
       }
     } else {
-      let { status, statusText, data } = error.response
+      const { status, statusText, data } = error.response
 
       // 这里得和后台反复沟通好，然后自己进行一个一个罗列，把每种情况都考虑完全
       if (status === 401) { // 401 未登录状态
