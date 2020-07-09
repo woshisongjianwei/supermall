@@ -75,8 +75,27 @@ export default {
     this.getHomeGoodsdata('sell', 1)
     this.displayGoods = this.goods.pop.list
   },
-  mounted() {},
+  mounted() {
+    const refresh = this.debounce(this.$refs.bscroll.refresh, 200)
+
+    this.$bus.$on('goodsImgLoadRefresh', () => {
+      console.log('图片已 load 完成')
+      refresh()
+    })
+  },
   methods: {
+    debounce(func, delay) {
+      let timer = null
+
+      return function(...args) {
+        if (timer) {
+          clearTimeout(timer)
+        }
+        timer = setTimeout(() => {
+          func.apply(this, args)
+        }, delay)
+      }
+    },
     getHomeMultidata() {
       getHomeMultidata()
         .then(res => {

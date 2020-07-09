@@ -10,6 +10,8 @@ Vue.use(Button)
 Vue.prototype.$loading = Loading
 Vue.prototype.$notification = Notification
 
+Vue.prototype.$bus = new Vue()
+
 Vue.config.productionTip = false
 
 new Vue({

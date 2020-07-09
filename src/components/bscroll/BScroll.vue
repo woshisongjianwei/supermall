@@ -148,6 +148,7 @@ export default {
       this.scroll && this.scroll.enable()
     },
     refresh() {
+      console.log('哥们，你正在刷新...')
       // 代理better-scroll的refresh方法
       this.scroll && this.scroll.refresh()
     },
@@ -168,7 +169,7 @@ export default {
     // 监听数据的变化，延时refreshDelay时间后调用refresh方法重新计算，保证滚动效果正常
     data() {
       setTimeout(() => {
-        console.log('兄弟，你在刷新...')
+        console.log('兄弟，你传给我的 data 变了，我可要刷新了...')
         this.refresh()
       }, this.refreshDelay)
     }
