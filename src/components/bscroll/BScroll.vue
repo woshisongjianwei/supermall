@@ -147,14 +147,17 @@ export default {
       // 代理better-scroll的enable方法
       this.scroll && this.scroll.enable()
     },
+    getScrollY() {
+      return this.scroll.y
+    },
     refresh() {
       console.log('哥们，你正在刷新...')
       // 代理better-scroll的refresh方法
       this.scroll && this.scroll.refresh()
     },
-    scrollTo() {
+    scrollTo(...args) {
       // 代理better-scroll的scrollTo方法
-      this.scroll && this.scroll.scrollTo.apply(this.scroll, arguments)
+      this.scroll && this.scroll.scrollTo.apply(this.scroll, args)
     },
     scrollToElement() {
       // 代理better-scroll的scrollToElement方法
