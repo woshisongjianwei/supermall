@@ -19,7 +19,7 @@
       :pullup="true"
       @pullingdown="loadPullingdownGoodsdata"
       @pullingup="loadPullingupGoodsdata"
-      @scrolling="toggleBacktop"
+      @scrolling="toggleBacktopAndTabcontrol"
       class="bscroll-wrapper"
       ref="bscroll"
     >
@@ -118,6 +118,7 @@ export default {
     this.saveY = this.$refs.bscroll.getScrollY()
   },
   methods: {
+    // 获取轮播图数据、推荐区数据
     getHomeMultidata() {
       getHomeMultidata()
         .then(res => {
@@ -129,6 +130,7 @@ export default {
           console.log(err)
         })
     },
+    // 获取商品列表数据
     getHomeGoodsdata(type, page) {
       getHomeGoodsdata(type, page)
         .then(res => {
@@ -139,11 +141,13 @@ export default {
           console.log(err)
         })
     },
+    // BScroll 插件的下拉刷新
     loadPullingdownGoodsdata() {
       let page = this.goods[this.currentType].page + 1
       this.getHomeGoodsdata(this.currentType, page)
       this.goods[this.currentType].page++
     },
+    // BScroll 插件的上拉刷新
     loadPullingupGoodsdata() {
       let page = this.goods[this.currentType].page + 1
       this.getHomeGoodsdata(this.currentType, page)
@@ -151,6 +155,7 @@ export default {
 
       this.$refs.bscroll.finishPullUp()
     },
+    // tabControl 子组件的点击
     tabClick(index) {
       this.homeTabcontrolIndex = index
       if (index === 0) {
@@ -164,7 +169,8 @@ export default {
         this.currentType = 'sell'
       }
     },
-    toggleBacktop(pos) {
+    // BScroll 滚动时，切换 BackTop 子组件显隐和 TabControl 子组件吸顶效果
+    toggleBacktopAndTabcontrol(pos) {
       if (-pos.y > 1000) {
         this.isShowBacktop = true
       } else {
@@ -177,12 +183,15 @@ export default {
         this.isShowTabcontrol = false
       }
     },
+    // BackTop 子组件点击回到顶部
     backtopClick() {
       this.$refs.bscroll.scrollTo(0, 0, 600)
     },
+    // 获取 TabControl 子组件最开始的位置的 offsetTop 值
     getTabcontrolOriginTop() {
       this.tabcontrolOriginTop = this.$refs.tabControl.$el.offsetTop
     },
+    // 轮播图图片加载完，子组件触发父组件
     homeSwiperImgLoad() {
       // 多个异步操作短时间内迅速发生，这里得采用防抖动函数机制来进行处理
       this.debounceTabcontrol()
