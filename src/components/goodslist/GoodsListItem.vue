@@ -1,6 +1,6 @@
 <template>
-  <div class="goods-list-item">
-    <img :src="goodsItem.show.img" alt @load="goodsImgLoad" />
+  <div @click="itemClick(goodsItem.iid)" class="goods-list-item">
+    <img :src="compuImg" @load="goodsImgLoad" alt />
     <div class="goods-info">
       <p class="title">{{goodsItem.title}}</p>
       <p>
@@ -28,6 +28,19 @@ export default {
   methods: {
     goodsImgLoad() {
       this.$bus.$emit('goodsImgLoadRefresh')
+    },
+    itemClick(iid) {
+      this.$router.push({
+        path: '/detail',
+        query: {
+          iid
+        }
+      })
+    }
+  },
+  computed: {
+    compuImg() {
+      return this.goodsItem.image || this.goodsItem.show.img
     }
   }
 }
@@ -44,7 +57,7 @@ export default {
 .goods-info {
   text-align: center;
   font-size: 12px;
-  margin-top: 5px;
+  margin: 5px 0 5px;
 }
 .goods-info .title {
   overflow: hidden;

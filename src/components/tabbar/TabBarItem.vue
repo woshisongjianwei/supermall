@@ -70,6 +70,6 @@ export default {
   margin-bottom: 2px;
 }
 .red {
-  color: red;
+  color: #ff5777;
 }
 </style>

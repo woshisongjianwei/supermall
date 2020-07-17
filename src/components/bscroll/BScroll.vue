@@ -151,7 +151,7 @@ export default {
       return this.scroll.y
     },
     refresh() {
-      console.log('哥们，你正在刷新...')
+      console.log('哥们，你正在刷新我 BScroll...')
       // 代理better-scroll的refresh方法
       this.scroll && this.scroll.refresh()
     },

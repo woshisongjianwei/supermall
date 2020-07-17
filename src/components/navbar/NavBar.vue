@@ -27,12 +27,18 @@ export default {
   justify-content: flex-start;
   align-items: center;
 }
-.left,
+.left {
+  width: 60px;
+  font-size: 30px;
+  text-align: center;
+  color: #999999;
+}
 .right {
   width: 60px;
 }
 .center {
   flex: 1;
   text-align: center;
+  font-size: 14px;
 }
 </style>

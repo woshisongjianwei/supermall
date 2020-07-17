@@ -15,13 +15,14 @@
 
     <b-scroll
       :data="displayGoods"
+      :probeType="3"
       :pulldown="false"
       :pullup="true"
       @pullingdown="loadPullingdownGoodsdata"
       @pullingup="loadPullingupGoodsdata"
       @scrolling="toggleBacktopAndTabcontrol"
       class="bscroll-wrapper"
-      ref="bscroll"
+      ref="homeBscroll"
     >
       <home-swiper :banners="banners" @homeswiperimgload="homeSwiperImgLoad"></home-swiper>
 
@@ -53,7 +54,6 @@ import FeatureView from './childComps/FeatureView.vue'
 import TabControl from '@/components/tabcontrol/TabControl.vue'
 import GoodsList from '@/components/goodslist/GoodsList.vue'
 import BScroll from '@/components/bscroll/BScroll.vue'
-
 import BackTop from '@/components/backtop/BackTop.vue'
 
 import { debounce } from '@/common/utils.js'
@@ -87,6 +87,9 @@ export default {
       isShowTabcontrol: false,
       homeTabcontrolIndex: 0,
       tabcontrolOriginTop: 0,
+
+      debounceGoodImg: null,
+      debounceGoodImgCB: null,
       debounceTabcontrol: null
     }
   },
@@ -100,22 +103,24 @@ export default {
   mounted() {
     // 防抖动函数 debounce 函数的第一次用法，实现效果：30 个商品图片需要加载 30 次，但是 BScroll 插件可能只刷新了几次
     // 多个异步操作短时间内迅速发生，这里得采用防抖动函数机制来进行处理
-    const debounceRefresh = debounce(this.$refs.bscroll.refresh, 200)
-    this.$bus.$on('goodsImgLoadRefresh', () => {
-      console.log('图片已 load 完成')
-      debounceRefresh()
-    })
+    this.debounceGoodImg = debounce(this.$refs.homeBscroll.refresh, 200)
+    this.debounceGoodImgCB = () => {
+      this.debounceGoodImg()
+    }
+    this.$bus.$on('goodsImgLoadRefresh', this.debounceGoodImgCB)
 
     // 防抖动函数 debounce 的第二次用法，实现效果：4 张轮播图图片需要加载 4 次，
     // 但是计算 tabControl 子组件的 offsetTop 值可能只计算了 1、2 次
     this.debounceTabcontrol = debounce(this.getTabcontrolOriginTop, 200)
   },
   activated() {
-    this.$refs.bscroll.refresh() // 这行代码必须有，路由切回来先刷新，再跳回原来滚动条的位置
-    this.$refs.bscroll.scrollTo(0, this.saveY, 0)
+    this.$refs.homeBscroll.refresh() // 这行代码必须有，路由切回来先刷新，再跳回原来滚动条的位置
+    this.$refs.homeBscroll.scrollTo(0, this.saveY, 0)
   },
   deactivated() {
-    this.saveY = this.$refs.bscroll.getScrollY()
+    this.saveY = this.$refs.homeBscroll.getScrollY()
+
+    this.$bus.$off('goodsImgLoadRefresh', this.debounceGoodImgCB)
   },
   methods: {
     // 获取轮播图数据、推荐区数据
@@ -153,7 +158,7 @@ export default {
       this.getHomeGoodsdata(this.currentType, page)
       this.goods[this.currentType].page++
 
-      this.$refs.bscroll.finishPullUp()
+      this.$refs.homeBscroll.finishPullUp()
     },
     // tabControl 子组件的点击
     tabClick(index) {
@@ -185,7 +190,7 @@ export default {
     },
     // BackTop 子组件点击回到顶部
     backtopClick() {
-      this.$refs.bscroll.scrollTo(0, 0, 600)
+      this.$refs.homeBscroll.scrollTo(0, 0, 600)
     },
     // 获取 TabControl 子组件最开始的位置的 offsetTop 值
     getTabcontrolOriginTop() {
