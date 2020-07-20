@@ -20,10 +20,18 @@ import NavBar from '@/components/navbar/NavBar.vue'
 
 export default {
   name: 'DetailNavBar',
-  data() {
-    return {
-      navTitles: ['商品', '参数', '评论', '推荐'],
-      navIndex: 0
+  props: {
+    navTitles: {
+      type: Array,
+      default() {
+        return []
+      }
+    },
+    navIndex: {
+      type: Number,
+      default() {
+        return 0
+      }
     }
   },
   methods: {
@@ -31,7 +39,7 @@ export default {
       this.$router.back()
     },
     navClick(index) {
-      this.navIndex = index
+      this.$emit('gonavposition', index)
     }
   },
   components: {

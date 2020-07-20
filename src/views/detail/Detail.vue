@@ -1,21 +1,40 @@
 <template>
   <div id="detail">
-    <detail-nav-bar></detail-nav-bar>
+    <detail-nav-bar :nav-index="navIndex" :nav-titles="navTitles" @gonavposition="goNavPosition"></detail-nav-bar>
 
-    <b-scroll :probeType="3" @scrolling="toggleBackTop" class="bscroll-wrapper" ref="detailBscroll">
+    <b-scroll
+      :isrefresh="true"
+      :probeType="3"
+      @refreshing="getNavPosition"
+      @scrolling="toggleBackTop"
+      class="bscroll-wrapper"
+      ref="detailBscroll"
+    >
       <detail-swiper :banners="banners"></detail-swiper>
 
       <detail-base-info :base-info="baseInfo" v-if="Object.keys(baseInfo).length !== 0"></detail-base-info>
 
       <detail-shop-info :shop-info="shopInfo"></detail-shop-info>
 
-      <detail-good-info :good-info="goodInfo" @goodinfoimgloadrefresh="goodInfoImgLoadRefresh"></detail-good-info>
+      <detail-good-info
+        :good-info="goodInfo"
+        @goodinfoimgloadrefresh="goodInfoImgLoadRefresh"
+        ref="detailGoodRef"
+      ></detail-good-info>
 
-      <detail-param-info :param-info="paramInfo" v-if="Object.keys(paramInfo).length !== 0"></detail-param-info>
+      <detail-param-info
+        :param-info="paramInfo"
+        ref="detailParamRef"
+        v-if="Object.keys(paramInfo).length !== 0"
+      ></detail-param-info>
 
-      <detail-comment-info :comment-info="commentInfo" v-if="Object.keys(commentInfo).length !== 0"></detail-comment-info>
+      <detail-comment-info
+        :comment-info="commentInfo"
+        ref="detailCommentRef"
+        v-if="Object.keys(commentInfo).length !== 0"
+      ></detail-comment-info>
 
-      <goods-list :goods="recommends" class="detail-recommends">
+      <goods-list :goods="recommends" class="detail-recommends" ref="detailRecommendRef">
         <div class="detail-recommends-title" slot="title">
           <span>推荐信息</span>
         </div>
@@ -46,6 +65,11 @@ export default {
   data() {
     return {
       iid: '',
+
+      navIndex: 0,
+      navTitles: ['商品', '参数', '评论', '推荐'],
+      navPositions: [],
+
       isShowBacktop: false,
       detailData: {},
       banners: [],
@@ -129,6 +153,19 @@ export default {
     goodInfoImgLoadRefresh() {
       this.debounceGoodInfoImg()
     },
+    // BScroll 组件每次 refresh 刷新完，都重新计算四个 NavBar 项的实际 offsetTop 值
+    getNavPosition() {
+      this.navPositions = []
+      this.navPositions.push(this.$refs.detailGoodRef.$el.offsetTop)
+      this.navPositions.push(this.$refs.detailParamRef.$el.offsetTop)
+      this.navPositions.push(this.$refs.detailCommentRef.$el.offsetTop)
+      this.navPositions.push(this.$refs.detailRecommendRef.$el.offsetTop)
+    },
+    // 点击 NavBar 不同区域，BScroll 组件滚动到相应点击位置去
+    goNavPosition(index) {
+      this.navIndex = index
+      this.$refs.detailBscroll.scrollTo(0, -this.navPositions[index], 600)
+    },
     // BScroll 滚动时，切换 BackTop 子组件显隐
     toggleBackTop(pos) {
       if (-pos.y > 1000) {
@@ -136,6 +173,23 @@ export default {
       } else {
         this.isShowBacktop = false
       }
+
+      // 这个寻找相应 NavBar 索引值的手段，稍微有点复杂
+      this.navPositions.forEach((item, index, arr) => {
+        // 这个判断条件很关键，可拦截 90% 的循环次数
+        if (this.navIndex !== index) {
+          if (
+            index < arr.length - 1 &&
+            -pos.y > item &&
+            -pos.y < arr[index + 1]
+          ) {
+            this.navIndex = index
+          }
+          if (index === arr.length - 1 && -pos.y > arr[arr.length - 1]) {
+            this.navIndex = arr.length - 1
+          }
+        }
+      })
     },
     // BackTop 子组件点击回到顶部
     backtopClick() {

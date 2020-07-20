@@ -70,6 +70,13 @@ export default {
       default: false
     },
     /**
+     * 是否开启组件的 refresh 刷新事件，用于刷新后的额外逻辑处理
+     */
+    isrefresh: {
+      type: Boolean,
+      default: false
+    },
+    /**
      * 当数据更新后，刷新scroll的延时。
      */
     refreshDelay: {
@@ -129,6 +136,13 @@ export default {
           if (pos.y > 50) {
             this.$emit('pullingdown')
           }
+        })
+      }
+
+      // 是否派发组件 refresh 刷新的事件
+      if (this.isrefresh) {
+        this.scroll.on('refresh', () => {
+          this.$emit('refreshing')
         })
       }
 
