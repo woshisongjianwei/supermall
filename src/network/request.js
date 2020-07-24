@@ -15,15 +15,16 @@ const xhr = axios.create({
 // 设置post请求头
 xhr.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
 
-let loadingInstance
-
 xhr.interceptors.request.use(
   config => {
     console.log(config)
     console.log('进来了 1111111111111111111')
 
     // loading
-    loadingInstance = Vue.prototype.$loading.service({})
+    Vue.prototype.$indicator.open({
+      text: '加载中...',
+      spinnerType: 'fading-circle'
+    })
 
     // 添加token
     const userInfo = JSON.parse(sessionStorage.getItem('userInfo'))
@@ -54,7 +55,7 @@ xhr.interceptors.request.use(
     console.log('进来了 2222222222222222222')
 
     // loading
-    loadingInstance.close()
+    Vue.prototype.$indicator.close()
 
     return Promise.reject(error)
   }
@@ -66,7 +67,7 @@ xhr.interceptors.response.use(
     console.log('出去了 1111111111111111111')
 
     // loading
-    loadingInstance.close()
+    Vue.prototype.$indicator.close()
 
     // 决定因素有两重，一重是最外层的 response.status，这一重是 axios 的源码封装的
     // 另一重是 response.data.code，这一重是咱们本项目自己的逻辑
@@ -85,10 +86,9 @@ xhr.interceptors.response.use(
       if (data.code === '300005') {
         // 后端返回的 date 里面最好有个 message，把准确的错误原因给我返回来
         // console.log(data.message)
-        Vue.prototype.$notification.error({
-          title: '错误',
+        Vue.prototype.$toast({
           message: data.message,
-          duration: 3000
+          duration: 1500
         })
       }
       return Promise.resolve(data)
@@ -103,7 +103,7 @@ xhr.interceptors.response.use(
     console.log('出去了 222222222222222222222')
 
     // loading
-    loadingInstance.close()
+    Vue.prototype.$indicator.close()
 
     let info = {}
     if (!error.response) {
@@ -123,18 +123,16 @@ xhr.interceptors.response.use(
         router.push({ path: '/login' })
       } else if (status === 404) { // 404请求不存在
         // console.log('请求不存在') // 此处可采用 element-ui 的 message 弹框实现
-        Vue.prototype.$notification.error({
-          title: '错误',
+        Vue.prototype.$toast({
           message: '请求不存在',
-          duration: 3000
+          duration: 1500
         })
       } else {
         // 后端返回的 date 里面最好有个 message，把准确的错误原因给我返回来
         // console.log(data.message) // 此处可采用 element-ui 的 message 弹框实现
-        Vue.prototype.$notification.error({
-          title: '错误',
+        Vue.prototype.$toast({
           message: data.message,
-          duration: 3000
+          duration: 1500
         })
       }
       // 此处整理错误信息格式

@@ -41,6 +41,8 @@
       </goods-list>
     </b-scroll>
 
+    <detail-bottom-bar @addtocart="addToCart"></detail-bottom-bar>
+
     <back-top @click.native="backtopClick" class="detail-back-top" v-show="isShowBacktop"></back-top>
   </div>
 </template>
@@ -55,6 +57,8 @@ import DetailParamInfo from '@/views/detail/childComps/DetailParamInfo.vue'
 import DetailCommentInfo from '@/views/detail/childComps/DetailCommentInfo.vue'
 import GoodsList from '@/components/goodslist/GoodsList.vue'
 import BScroll from '@/components/bscroll/BScroll.vue'
+
+import DetailBottomBar from '@/views/detail/childComps/DetailBottomBar.vue'
 import BackTop from '@/components/backtop/BackTop.vue'
 
 import { debounce } from '@/common/utils.js'
@@ -118,7 +122,7 @@ export default {
           this.banners = this.detailData.itemInfo.topImages
 
           this.baseInfo.title = this.detailData.itemInfo.title
-          this.baseInfo.price = this.detailData.itemInfo.price
+          this.baseInfo.price = this.detailData.itemInfo.lowNowPrice
           this.baseInfo.oldPrice = this.detailData.itemInfo.oldPrice
           this.baseInfo.discountDesc = this.detailData.itemInfo.discountDesc
           this.baseInfo.columns = this.detailData.columns
@@ -191,6 +195,15 @@ export default {
         }
       })
     },
+    addToCart() {
+      let good = {}
+      good.iid = this.iid
+      good.img = this.banners[0]
+      good.title = this.baseInfo.title
+      good.price = parseFloat(this.baseInfo.price)
+      good.desc = this.goodInfo.desc
+      this.$store.commit('addCart', good)
+    },
     // BackTop 子组件点击回到顶部
     backtopClick() {
       this.$refs.detailBscroll.scrollTo(0, 0, 600)
@@ -206,6 +219,7 @@ export default {
     DetailCommentInfo,
     GoodsList,
     BScroll,
+    DetailBottomBar,
     BackTop
   }
 }
@@ -215,6 +229,8 @@ export default {
 #detail {
   height: 100vh;
   position: relative;
+  background-color: #ffffff;
+  z-index: 10;
 }
 .bscroll-wrapper {
   overflow: hidden;
