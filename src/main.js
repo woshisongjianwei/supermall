@@ -16,7 +16,6 @@ import 'font-awesome/css/font-awesome.css'
 Vue.use(VueLazyLoad, {
   preLoad: 1.3,
   // error: 'dist/error.png',
-  // loading: 'assets/img/common/placeholder.png',
   loading: require('assets/img/common/placeholder.png'),
   attempt: 3
 })
